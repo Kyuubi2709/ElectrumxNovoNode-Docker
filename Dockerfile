@@ -104,7 +104,10 @@ RUN openssl genrsa -out server.key 2048
 RUN openssl req -new -key server.key -out server.csr -subj "/C=US/ST=Denial/L=Springfield/O=Dis/CN=radiant4people.com"
 RUN openssl x509 -req -days 1825 -in server.csr -signkey server.key -out server.crt
 
-EXPOSE 50010 50012
+COPY run.sh /run.sh
+RUN chmod 755 /run.sh
 
+WORKDIR /data
 VOLUME /data
-ENTRYPOINT ["/bin/sh", "-c" , "novod -datadir=/data/novochain -conf=/backend/novo.conf && python3 /backend/novo-electrumx/electrumx_server"]
+ENTRYPOINT ["/bin/sh", "-c" , "/run.sh"]
+
