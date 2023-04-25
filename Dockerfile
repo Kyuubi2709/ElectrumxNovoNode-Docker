@@ -59,9 +59,8 @@ RUN make install
 # Remove novo folder, not need more
 RUN rm /root/novo -Rf
 
-RUN mkdir "/root/.novo/"
-RUN touch "/root/.novo/novo.conf"
-
+RUN mkdir "/backend"
+RUN touch "/backend/novo.conf"
 RUN echo '\
 rpcuser=NovoDockerUser\n\
 rpcpassword=NovoDockerPassword\n\
@@ -72,31 +71,24 @@ server=1\n\
 rpcworkqueue=512\n\
 rpcthreads=64\n\
 rpcallowip=0.0.0.0/0\
-' >/root/.novo/novo.conf 
-
+' >/backend/novo.conf 
 ####################################################### INSTALL ELECTRUMX WITH SSL
-
 # Create directory for DB
-RUN mkdir /root/novodb
-
-WORKDIR /root
-
+WORKDIR /backend
 # ORIGINAL SOURCE
 #RUN git clone https://github.com/3untz/novo-electrumx.git
 RUN git clone https://github.com/expiredhotdog/novo-electrumx
-
-WORKDIR /root/novo-electrumx
-
+WORKDIR /backend/novo-electrumx
 RUN python3 -m pip install -r requirements.txt
 
 ENV DAEMON_URL=http://NovoDockerUser:NovoDockerPassword@localhost:8665/
 ENV COIN=Novo
 ENV REQUEST_TIMEOUT=60
-ENV DB_DIRECTORY=/root/novodb
+ENV DB_DIRECTORY=/data/novo-electrumx-db
 ENV DB_ENGINE=leveldb
 ENV SERVICES=tcp://0.0.0.0:50010,ssl://0.0.0.0:50012,rpc://0.0.0.0:8000
-ENV SSL_CERTFILE=/root/novodb/server.crt
-ENV SSL_KEYFILE=/root/novodb/server.key
+ENV SSL_CERTFILE=/backend/ssl/server.crt
+ENV SSL_KEYFILE=/backend/ssl/server.key
 ENV HOST=""
 ENV ALLOW_ROOT=true
 ENV CACHE_MB=10000
@@ -107,11 +99,12 @@ ENV BANDWIDTH_UNIT_COST=20000
 ENV RESOURCE_USAGE_LIMIT=200000
 
 # Create SSL
-WORKDIR /root/novodb
+WORKDIR /backend/ssl
 RUN openssl genrsa -out server.key 2048
 RUN openssl req -new -key server.key -out server.csr -subj "/C=US/ST=Denial/L=Springfield/O=Dis/CN=radiant4people.com"
 RUN openssl x509 -req -days 1825 -in server.csr -signkey server.key -out server.crt
 
 EXPOSE 50010 50012
 
-ENTRYPOINT ["/bin/sh", "-c" , "novod && python3 /root/novo-electrumx/electrumx_server"]
+VOLUME /data
+ENTRYPOINT ["/bin/sh", "-c" , "novod -datadir=/data/novochain -conf=/backend/novo.conf && python3 /backend/novo-electrumx/electrumx_server"]
