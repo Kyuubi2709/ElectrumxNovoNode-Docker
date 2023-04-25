@@ -107,6 +107,8 @@ RUN openssl x509 -req -days 1825 -in server.csr -signkey server.key -out server.
 COPY run.sh /run.sh
 RUN chmod 755 /run.sh
 
+EXPOSE 50010 50012 8000
+
 WORKDIR /data
 VOLUME /data
 ENTRYPOINT ["/bin/sh", "-c" , "/run.sh"]
