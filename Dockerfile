@@ -52,7 +52,7 @@ RUN git clone https://github.com/novochain/novo.git
 WORKDIR /root/novo
 
 RUN ./autogen.sh
-RUN ./configure
+RUN ./configure --disable-wallet
 RUN make
 RUN make install
 
