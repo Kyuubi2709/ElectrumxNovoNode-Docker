@@ -5,12 +5,12 @@ echo -e "Creating /data/novochain directory..."
 mkdir -p /root/.novo  
 touch /root/.novo/novo.conf
 cat <<- EOF > /root/.novo/novo.conf
-rpcuser=${RPC_USER:-RadiantDockerUser}
-rpcpassword=${RPC_PASS:-RadiantDockerPassword}
+rpcuser=NovoDockerUser
+rpcpassword=NovoDockerPassword
 listen=1
 daemon=1
 server=1
-rpcworkqueue=1024
+rpcworkqueue=512
 rpcthreads=64
 rpcallowip=0.0.0.0/0
 EOF
