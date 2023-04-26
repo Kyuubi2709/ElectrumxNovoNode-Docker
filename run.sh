@@ -10,6 +10,7 @@ rpcpassword=NovoDockerPassword
 listen=1
 daemon=1
 server=1
+index=1
 rpcworkqueue=512
 rpcthreads=64
 rpcallowip=0.0.0.0/0
