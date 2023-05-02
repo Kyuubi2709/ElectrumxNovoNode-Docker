@@ -58,6 +58,20 @@ RUN make install
 
 # Remove novo folder, not need more
 RUN rm /root/novo -Rf
+
+RUN mkdir "/backend"
+RUN touch "/backend/novo.conf"
+RUN echo '\
+rpcuser=NovoDockerUser\n\
+rpcpassword=NovoDockerPassword\n\
+\n\
+listen=1\n\
+daemon=1\n\
+server=1\n\
+rpcworkqueue=512\n\
+rpcthreads=64\n\
+rpcallowip=0.0.0.0/0\
+' >/backend/novo.conf 
 ####################################################### INSTALL ELECTRUMX WITH SSL
 # Create directory for DB
 WORKDIR /backend
@@ -70,7 +84,7 @@ RUN python3 -m pip install -r requirements.txt
 ENV DAEMON_URL=http://NovoDockerUser:NovoDockerPassword@localhost:8665/
 ENV COIN=Novo
 ENV REQUEST_TIMEOUT=60
-ENV DB_DIRECTORY=/root/novo-electrumx-db
+ENV DB_DIRECTORY=/data/novo-electrumx-db
 ENV DB_ENGINE=leveldb
 ENV SERVICES=tcp://0.0.0.0:50010,ssl://0.0.0.0:50012,rpc://0.0.0.0:8000
 ENV SSL_CERTFILE=/backend/ssl/server.crt
@@ -95,6 +109,6 @@ RUN chmod 755 /run.sh
 
 EXPOSE 50010 50012 8000
 
-WORKDIR /root
-VOLUME /root
+WORKDIR /data
+VOLUME /data
 ENTRYPOINT ["/bin/sh", "-c" , "/run.sh"]
